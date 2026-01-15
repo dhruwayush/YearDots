@@ -2,12 +2,14 @@ import 'package:async_wallpaper/async_wallpaper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:year_dots/core/utils/image_generator.dart';
+import 'package:year_dots/core/constants/app_colors.dart';
 import 'package:year_dots/domain/logic/date_logic.dart';
 
 class WallpaperService {
   
   /// Generates the wallpaper for today and sets it.
-  Future<bool> updateWallpaper() async {
+  /// Generates the wallpaper for today and sets it.
+  Future<bool> updateWallpaper({required AppTheme theme}) async {
     try {
       // 1. Calculate Data
       final progress = DateLogic.calculateProgress();
@@ -20,29 +22,25 @@ class WallpaperService {
         return true;
       }
 
-      final file = await ImageGenerator.generateWallpaperFile(progress);
+      final file = await ImageGenerator.generateWallpaperFile(progress, theme);
+      debugPrint("WallpaperService: Generated file at ${file.path}");
 
       // 3. Set Wallpaper
-      // Using async_wallpaper to set both home and lock screen
-      // If validation fails, we might try different platform channels or plugins
-      bool result = await AsyncWallpaper.setWallpaperFromFile(
-        filePath: file.path, 
-        wallpaperLocation: AsyncWallpaper.HOME_SCREEN, // Or BOTH
-        goToHome: false,
-      );
-      
-       // Set for Lock screen too if needed, or use BOTH constant if available plugin supports simple 'BOTH'
-       // async_wallpaper usually supports individual calls.
-       await AsyncWallpaper.setWallpaperFromFile(
+      // User requested ONLY Lock Screen
+      bool resultLock = await AsyncWallpaper.setWallpaperFromFile(
         filePath: file.path, 
         wallpaperLocation: AsyncWallpaper.LOCK_SCREEN,
         goToHome: false,
       );
 
-      return result;
-    } on PlatformException {
+      return resultLock;
+
+    } on PlatformException catch (e) {
+      debugPrint("WallpaperService: PlatformException: ${e.message}");
       return false;
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint("WallpaperService: Error: $e");
+      debugPrintStack(stackTrace: stack);
       return false;
     }
   }

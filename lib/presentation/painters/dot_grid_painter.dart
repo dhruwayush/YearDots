@@ -4,47 +4,55 @@ import 'package:year_dots/domain/models/year_progress.dart';
 
 class DotGridPainter extends CustomPainter {
   final YearProgress progress;
+  final AppTheme theme;
 
-  DotGridPainter({required this.progress});
+  DotGridPainter({required this.progress, required this.theme});
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Fill background
-    final bgPaint = Paint()..color = AppColors.background;
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
+    // Background is handled by parent/generator usually
+    // But for safety in UI we can keep it?  No, let's make it transparent or optional.
+    // Actually, if we paint it here, it will overwrite the ImageGenerator's black bg if we pass a smaller size?
+    // In ImageGenerator we pass a smaller size/clip. 
+    // If we paint bg here, we paint a black box in the middle of the screen. That's fine if it matches.
+    // But let's verify.
+    // simpler: just don't paint bg here if we want to be pure.
+    // BUT the UI HomeScreen relies on this painter too? 
+    // HomeScreen wraps it in Scaffold which has bg color.
+    // So we can remove bg paint here safely.
+    
+    // final bgPaint = Paint()..color = AppColors.background;
+    // canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
 
     final dotPaint = Paint()..style = PaintingStyle.fill;
     
     // Grid configuration
-    const int cols = 15; // Width
-    final int rows = (progress.totalDays / cols).ceil(); // Height based on total days
+    const int cols = 15;
+    // Calculate rows based on total days
+    final int rows = (progress.totalDays / cols).ceil();
     
-    // We base everything on width to keep dots round and spacing consistent
+    // Define Grid Constraints
+    // We want the grid to take up at most ~80% of the width
+    final double maxWidth = size.width * 0.80;
     
-    // Reference image shows the grid is fairly compact horizontally
-    final double horizontalPadding = size.width * 0.12; 
-    final double availableWidth = size.width - (horizontalPadding * 2);
-
-    // Initial calculation based on WIDTH
-    double cellWidth = availableWidth / cols;
-    double cellHeight = cellWidth * 1.15; 
+    // Calculate cell size based on width constraint first
+    double cellWidth = maxWidth / cols;
+    double cellHeight = cellWidth * 1.15; // Aspect ratio
     
-    // Check if HEIGHT is the limiting factor
-    final double requiredHeight = rows * cellHeight;
-    if (requiredHeight > size.height) {
-      // Height is too small! Scale down based on height.
-      // We'll leave zero vertical padding in this extreme case, or a small margin.
+    // Check if this height fits in the available vertical space
+    // If not, scale down keeping aspect ratio
+    if ((rows * cellHeight) > size.height) {
       cellHeight = size.height / rows;
-      cellWidth = cellHeight / 1.15; // Maintain aspect ratio
+      cellWidth = cellHeight / 1.15;
     }
-
-    // Re-calculate centering offsets based on final cell sizes
-    final double totalGridWidth = cols * cellWidth;
-    final double totalGridHeight = rows * cellHeight;
     
-    // Center horizontally and vertically in the available space
-    final double startX = (size.width - totalGridWidth) / 2;
-    final double startY = (size.height - totalGridHeight) / 2;
+    // Calculate actual dimensions of the resulting grid
+    final double actualGridWidth = cols * cellWidth;
+    final double actualGridHeight = rows * cellHeight;
+    
+    // Calculate Centering Offsets
+    final double startX = (size.width - actualGridWidth) / 2;
+    final double startY = (size.height - actualGridHeight) / 2;
 
     // Radius of the dot
     final double dotRadius = cellWidth * 0.35; // slightly fuller dots matches reference
@@ -59,20 +67,29 @@ class DotGridPainter extends CustomPainter {
         final double cy = startY + (row * cellHeight) + (cellHeight / 2);
 
         if (i < progress.dayOfYear) {
-          dotPaint.color = AppColors.dotPassed;
+          dotPaint.color = theme.dotPassed;
         } else if (i == progress.dayOfYear) {
-          dotPaint.color = AppColors.dotToday;
+          dotPaint.color = theme.dotToday;
         } else {
-          dotPaint.color = AppColors.dotFuture;
+          dotPaint.color = theme.dotFuture;
         }
 
-        canvas.drawCircle(Offset(cx, cy), dotRadius, dotPaint);
+        if (theme.dotStyle == DotStyle.round) {
+          canvas.drawCircle(Offset(cx, cy), dotRadius, dotPaint);
+        } else {
+          // Square with slight rounding for specialized style
+          final double size = dotRadius * 2;
+          final rect = Rect.fromCenter(center: Offset(cx, cy), width: size, height: size);
+          // Small corner radius for "squircle" look
+          canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(size * 0.2)), dotPaint);
+        }
     }
   }
 
   @override
   bool shouldRepaint(covariant DotGridPainter oldDelegate) {
      return oldDelegate.progress.dayOfYear != progress.dayOfYear ||
-            oldDelegate.progress.totalDays != progress.totalDays;
+            oldDelegate.progress.totalDays != progress.totalDays ||
+            oldDelegate.theme.id != theme.id;
   }
 }

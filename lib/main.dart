@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Add provider
 import 'package:year_dots/data/services/background_service.dart';
-import 'package:year_dots/presentation/screens/home_screen.dart';
+import 'package:year_dots/presentation/screens/dashboard_screen.dart'; // New screen
+import 'package:year_dots/presentation/viewmodels/home_viewmodel.dart'; // Needed for provider
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,14 +20,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'YearDots',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFF7A00)),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => HomeViewModel(),
+      child: MaterialApp(
+        title: 'YearDots',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF13C8EC), // Cyan
+            brightness: Brightness.dark, 
+          ),
+          useMaterial3: true,
+        ),
+        home: const DashboardScreen(),
+        debugShowCheckedModeBanner: false,
       ),
-      home: const HomeScreen(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
