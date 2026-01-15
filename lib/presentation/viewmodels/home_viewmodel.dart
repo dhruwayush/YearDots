@@ -34,6 +34,8 @@ class HomeViewModel extends ChangeNotifier {
         final textColorValue = prefs.getInt('theme_text_color');
         final bgColorValue = prefs.getInt('theme_background'); // New
         final showText = prefs.getBool('theme_show_text') ?? true;
+        final scale = prefs.getDouble('theme_scale') ?? 1.0;
+        final yOffset = prefs.getDouble('theme_y_offset') ?? 0.0;
         
         final base = AppTheme.defaults;
         
@@ -57,6 +59,8 @@ class HomeViewModel extends ChangeNotifier {
            textSecondary: textSecondary,
            dotStyle: DotStyle.values[styleIndex],
            showText: showText,
+           scale: scale,
+           yOffset: yOffset,
         );
     } else {
         _selectedTheme = AppTheme.fromId(themeId);
@@ -77,6 +81,8 @@ class HomeViewModel extends ChangeNotifier {
         await prefs.setInt('theme_text_color', theme.textPrimary.value);
         await prefs.setInt('theme_background', theme.background.value); // New
         await prefs.setBool('theme_show_text', theme.showText);
+        await prefs.setDouble('theme_scale', theme.scale);
+        await prefs.setDouble('theme_y_offset', theme.yOffset);
     }
   }
   

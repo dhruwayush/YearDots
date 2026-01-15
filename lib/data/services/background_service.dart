@@ -29,6 +29,9 @@ void callbackDispatcher() {
              final bgColorValue = prefs.getInt('theme_background'); // New
              final styleIndex = prefs.getInt('theme_style') ?? 0;
              final showText = prefs.getBool('theme_show_text') ?? true;
+             final scale = prefs.getDouble('theme_scale') ?? 1.0;
+             final yOffset = prefs.getDouble('theme_y_offset') ?? 0.0;
+             
              final base = AppTheme.defaults;
              
              Color textPrimary = base.textPrimary;
@@ -52,6 +55,8 @@ void callbackDispatcher() {
                textSecondary: textSecondary,
                dotStyle: DotStyle.values[styleIndex],
                showText: showText,
+               scale: scale,
+               yOffset: yOffset,
              );
           } else {
              theme = AppTheme.fromId(themeId);

@@ -41,69 +41,84 @@ class PhoneFramePreview extends StatelessWidget {
               children: [
                 Container(color: theme.background),
                 
-                // 2. The Dot Grid (Centered) with Margins for Text
+                // Content Layer (Transformed)
                 Positioned.fill(
-                  child: Padding(
-                    // Reduced margins to allow dots to be larger
-                    padding: EdgeInsets.only(
-                      top: height * 0.13,
-                      bottom: height * 0.22, 
-                      left: 16, 
-                      right: 16
-                    ),
-                    child: CustomPaint(
-                      painter: DotGridPainter(progress: progress, theme: theme),
+                  child: Transform.translate(
+                    offset: Offset(0, theme.yOffset), // Apply Y Position
+                    child: Transform.scale(
+                      scale: theme.scale, // Apply Scale
+                      child: Stack(
+                        children: [
+                            // 2. The Dot Grid (Centered) with Margins for Text
+                            Positioned.fill(
+                              child: Padding(
+                                // Reduced margins to allow dots to be larger
+                                padding: EdgeInsets.only(
+                                  top: height * 0.11, // Moved UP (was 0.13)
+                                  bottom: height * 0.22, 
+                                  left: 16, 
+                                  right: 16
+                                ),
+                                child: CustomPaint(
+                                  painter: DotGridPainter(progress: progress, theme: theme),
+                                ),
+                              ),
+                            ),
+                            
+                            if (theme.showText) ...[
+                               // Top Month
+                               Positioned(
+                                 top: height * 0.07, 
+                                 left: 10, 
+                                 right: 10,
+                                 child: Text(
+                                   progress.monthName,
+                                   textAlign: TextAlign.center,
+                                   style: GoogleFonts.roboto(
+                                     color: theme.textSecondary.withOpacity(1.0), 
+                                     fontSize: width * 0.05, 
+                                     fontWeight: FontWeight.w400,
+                                     letterSpacing: 3.0, 
+                                   ),
+                                 ),
+                               ),
+
+                               // Bottom Stats
+                               Positioned(
+                                 bottom: height * 0.14, // Moved UP (was 0.12)
+                                 left: 10, 
+                                 right: 10,
+                                 child: Row(
+                                   mainAxisAlignment: MainAxisAlignment.center,
+                                   crossAxisAlignment: CrossAxisAlignment.baseline,
+                                   textBaseline: TextBaseline.alphabetic,
+                                   children: [
+                                     Text(
+                                       "${progress.dayOfYear} / ${progress.totalDays}",
+                                       style: GoogleFonts.outfit( 
+                                         color: theme.dotToday, 
+                                         fontSize: width * 0.05, 
+                                         fontWeight: FontWeight.w600,
+                                       ),
+                                     ),
+                                     SizedBox(width: 16), // Increased spacing (was 8)
+                                     Text(
+                                       "${progress.daysLeft} left", 
+                                       style: GoogleFonts.roboto(
+                                         color: theme.textSecondary.withOpacity(0.8),
+                                         fontSize: width * 0.035, 
+                                         fontWeight: FontWeight.w400,
+                                       ),
+                                     ),
+                                   ],
+                                 ),
+                               ),
+                            ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                
-                if (theme.showText) ...[
-                   // Top Month
-                   Positioned(
-                     top: height * 0.07, 
-                     left: 10, 
-                     right: 10,
-                     child: Text(
-                       progress.monthName,
-                       textAlign: TextAlign.center,
-                       style: GoogleFonts.roboto(
-                         color: theme.textSecondary.withOpacity(1.0), 
-                         fontSize: width * 0.05, // Larger (was 0.035)
-                         fontWeight: FontWeight.w400,
-                         letterSpacing: 3.0, 
-                       ),
-                     ),
-                   ),
-
-                   // Bottom Stats
-                   Positioned(
-                     bottom: height * 0.12,
-                     left: 10,
-                     right: 10,
-                     child: Column(
-                       mainAxisSize: MainAxisSize.min,
-                       children: [
-                         Text(
-                           "${progress.dayOfYear} / ${progress.totalDays}",
-                           style: GoogleFonts.roboto(
-                             color: theme.textPrimary.withOpacity(1.0),
-                             fontSize: width * 0.09, // Larger (was 0.06)
-                             fontWeight: FontWeight.w400,
-                           ),
-                         ),
-                         SizedBox(height: height * 0.005),
-                         Text(
-                           "${progress.daysLeft} days left",
-                           style: GoogleFonts.roboto(
-                             color: theme.textSecondary.withOpacity(1.0),
-                             fontSize: width * 0.045, 
-                             fontWeight: FontWeight.w400,
-                           ),
-                         ),
-                       ],
-                     ),
-                   ),
-                ],
                 
                 // ... (Status Bar and others)
                 Positioned(

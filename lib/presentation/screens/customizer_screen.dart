@@ -171,6 +171,66 @@ class CustomizerScreen extends StatelessWidget {
                           ),
                           
                           const SizedBox(height: 32),
+
+                          // Section: Layout Adjustments (Scale & Position)
+                          _buildSectionHeader("Layout Adjustments"),
+                          const SizedBox(height: 16),
+                          
+                          // Scale Slider
+                          Row(
+                            children: [
+                                const Icon(Icons.zoom_in, color: Colors.white70, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                            Text("Scale: ${(theme.scale * 100).toInt()}%", style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                                            Slider(
+                                                value: theme.scale,
+                                                min: 0.5,
+                                                max: 1.5,
+                                                divisions: 20,
+                                                activeColor: AppColors.primary,
+                                                inactiveColor: Colors.white10,
+                                                onChanged: (val) {
+                                                    _updateThemeLayout(viewModel, scale: val);
+                                                },
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                            ],
+                          ),
+                          
+                          // Position Slider
+                          Row(
+                            children: [
+                                const Icon(Icons.unfold_more, color: Colors.white70, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                            Text("Position Y: ${theme.yOffset.toInt()}", style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                                            Slider(
+                                                value: theme.yOffset,
+                                                min: -400,
+                                                max: 400,
+                                                divisions: 40,
+                                                activeColor: AppColors.primary,
+                                                inactiveColor: Colors.white10,
+                                                onChanged: (val) {
+                                                    _updateThemeLayout(viewModel, yOffset: val);
+                                                },
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 32),
                           // Section: Text Visibility & Color
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -344,7 +404,13 @@ class CustomizerScreen extends StatelessWidget {
       vm.setTheme(newTheme);
   }
 
-  AppTheme _createNewTheme(AppTheme current, {DotStyle? style, Color? dotToday, Color? textPrimary, Color? textSecondary, bool? showText, Color? background}) {
+  void _updateThemeLayout(HomeViewModel vm, {double? scale, double? yOffset}) {
+     final current = vm.selectedTheme;
+     final newTheme = _createNewTheme(current, scale: scale, yOffset: yOffset);
+     vm.setTheme(newTheme);
+  }
+
+  AppTheme _createNewTheme(AppTheme current, {DotStyle? style, Color? dotToday, Color? textPrimary, Color? textSecondary, bool? showText, Color? background, double? scale, double? yOffset}) {
      return AppTheme(
        id: 'custom_${DateTime.now().millisecondsSinceEpoch}', 
        name: 'Custom',
@@ -357,6 +423,8 @@ class CustomizerScreen extends StatelessWidget {
        textSecondary: textSecondary ?? current.textSecondary,
        dotStyle: style ?? current.dotStyle,
        showText: showText ?? current.showText,
+       scale: scale ?? current.scale,
+       yOffset: yOffset ?? current.yOffset,
      );
   }
 }

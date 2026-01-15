@@ -21,15 +21,30 @@ class ImageGenerator {
     final bgPaint = Paint()..color = theme.background;
     canvas.drawRect(Rect.fromLTWH(0, 0, width, height), bgPaint);
 
-    // 3. Draw Grid in Middle Zone
-    // Define a "safe" middle area for the grid so it doesn't touch top or bottom text
+    // 3. Draw Content (Grid + Text) with Layout Transforms
+    canvas.save();
+    
+    // Apply Scale (Centered)
+    canvas.translate(width / 2, height / 2);
+    canvas.scale(theme.scale, theme.scale);
+    canvas.translate(-width / 2, -height / 2);
+    
+    // Apply Y Offset
+    // IMPORTANT: In Flutter Widget, offset is pixels. Here 1080px width vs phone screen width.
+    // We should scale the offset if the theme.yOffset is in "screen pixels".
+    // Preview uses logical pixels. Generator uses 1080px.
+    // Ratio ~3.0 (approx 1080 / 360).
+    // Let's assume a factor of 2.8 to 3.0.
+    const double pixelRatio = 3.0; // Approximation for High Res
+    canvas.translate(0, theme.yOffset * pixelRatio);
+
+    // Grid Painting
     const double topMargin = 300; 
-    const double bottomMargin = 500; // Leave expanded room for stats
+    const double bottomMargin = 500; 
     const double gridHeight = height - topMargin - bottomMargin;
     
     canvas.save();
     canvas.translate(0, topMargin);
-    // reduce size passed to painter so it centers within this smaller box
     final gridPainter = DotGridPainter(progress: progress, theme: theme);
     gridPainter.paint(canvas, const Size(width, gridHeight));
     canvas.restore();
@@ -61,39 +76,63 @@ class ImageGenerator {
         textPainter.paint(canvas, Offset(x, y));
       }
   
-      // Top Month (Centered in top margin)
-      // 300px space. Center around 150px.
+      // Top Month
       drawTextCentered(
         progress.monthName, 
-        120, 
-        32, 
-        theme.textSecondary, 
-        FontWeight.w400, 
-        6.0 
+        200, 
+        48, 
+        theme.textSecondary.withOpacity(1.0), 
+        FontWeight.w400,
+        3.0
       );
   
       // Bottom Stats (Below grid)
-      // Starts at height - bottomMargin (e.g. 1920 - 500 = 1420)
-      final statsStartY = height - bottomMargin + 100; // Add some padding
+      // Starts at height - bottomMargin
+      // Moving it UP -> Smaller Y value.
+      // Previously: height - 500 + 100 = height - 400.
+      // Target: Move UP. New: height - 500 + 20 = height - 480.
+      final statsStartY = height - bottomMargin + 20;
+
+      // We need to simulate the Row logic manually on Canvas
+      // "15 / 365" (Highlight)  + "350 days left" (Grey)
       
-      drawTextCentered(
-        "${progress.dayOfYear} / ${progress.totalDays}",
-        statsStartY,
-        64,
-        theme.textPrimary,
-        FontWeight.w400,
-        0,
+      final mainText = "${progress.dayOfYear} / ${progress.totalDays}";
+      final subText = "   ${progress.daysLeft} left"; // Three spaces = wider gap
+      
+      // Calculate widths to center the whole block
+      final mainStyle = TextStyle(
+         color: theme.dotToday, // Highlight Color
+         fontSize: 48, // Smaller (was 64)
+         fontFamily: 'Roboto', // Ideally bundled font, fallback to Roboto
+         fontWeight: FontWeight.w600,
+      );
+      final subStyle = TextStyle(
+         color: theme.textSecondary.withOpacity(0.8),
+         fontSize: 32, // Smaller
+         fontFamily: 'Roboto', 
+         fontWeight: FontWeight.w400,
       );
       
-      drawTextCentered(
-        "${progress.daysLeft} days left",
-        statsStartY + 80,
-        36,
-        theme.textSecondary,
-        FontWeight.w400,
-        0,
-      );
+      final mainSpan = TextSpan(text: mainText, style: mainStyle);
+      final subSpan = TextSpan(text: subText, style: subStyle);
+      
+      final mainPainter = TextPainter(text: mainSpan, textDirection: TextDirection.ltr)..layout();
+      final subPainter = TextPainter(text: subSpan, textDirection: TextDirection.ltr)..layout();
+      
+      final totalWidth = mainPainter.width + subPainter.width;
+      final startX = (width - totalWidth) / 2;
+      
+      // Draw Main Part
+      mainPainter.paint(canvas, Offset(startX, statsStartY));
+      
+      // Draw Sub Part (aligned baselineish, let's just align bottoms or centers)
+      // Align baselines roughly by font size difference
+      final baselineDiff = mainStyle.fontSize! - subStyle.fontSize!;
+      subPainter.paint(canvas, Offset(startX + mainPainter.width, statsStartY + (baselineDiff/2) + 4));
     }
+    
+    // Restore the Layout Transform (Scale/Offset)
+    canvas.restore();
 
     // 5. Convert to Image
     final picture = recorder.endRecording();
