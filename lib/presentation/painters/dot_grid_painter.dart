@@ -27,7 +27,7 @@ class DotGridPainter extends CustomPainter {
     final dotPaint = Paint()..style = PaintingStyle.fill;
     
     // Grid configuration
-    const int cols = 15;
+    final int cols = theme.gridColumns;
     // Calculate rows based on total days
     final int rows = (progress.totalDays / cols).ceil();
     

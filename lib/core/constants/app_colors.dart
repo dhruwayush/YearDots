@@ -30,8 +30,7 @@ class AppTheme {
   final Color textSecondary;
   final DotStyle dotStyle;
   final bool showText;
-  final double scale;
-  final double yOffset;
+  final int gridColumns;
 
   const AppTheme({
     required this.id,
@@ -45,8 +44,7 @@ class AppTheme {
     required this.textSecondary,
     this.dotStyle = DotStyle.round,
     this.showText = true,
-    this.scale = 1.0,
-    this.yOffset = 0.0,
+    this.gridColumns = 15,
   });
 
   factory AppTheme.fromId(String id) {
@@ -66,8 +64,7 @@ class AppTheme {
     textSecondary: Color(0xFF94A3B8), // Slate 400
     dotStyle: DotStyle.round,
     showText: true,
-    scale: 1.0,
-    yOffset: 0.0,
+    gridColumns: 15,
   );
 
   static const List<AppTheme> themes = [defaults];

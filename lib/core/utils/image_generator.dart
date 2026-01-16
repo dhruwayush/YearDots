@@ -21,23 +21,7 @@ class ImageGenerator {
     final bgPaint = Paint()..color = theme.background;
     canvas.drawRect(Rect.fromLTWH(0, 0, width, height), bgPaint);
 
-    // 3. Draw Content (Grid + Text) with Layout Transforms
-    canvas.save();
-    
-    // Apply Scale (Centered)
-    canvas.translate(width / 2, height / 2);
-    canvas.scale(theme.scale, theme.scale);
-    canvas.translate(-width / 2, -height / 2);
-    
-    // Apply Y Offset
-    // IMPORTANT: In Flutter Widget, offset is pixels. Here 1080px width vs phone screen width.
-    // We should scale the offset if the theme.yOffset is in "screen pixels".
-    // Preview uses logical pixels. Generator uses 1080px.
-    // Ratio ~3.0 (approx 1080 / 360).
-    // Let's assume a factor of 2.8 to 3.0.
-    const double pixelRatio = 3.0; // Approximation for High Res
-    canvas.translate(0, theme.yOffset * pixelRatio);
-
+    // 3. Draw Content (Grid + Text)
     // Grid Painting
     const double topMargin = 300; 
     const double bottomMargin = 500; 
@@ -131,9 +115,7 @@ class ImageGenerator {
       subPainter.paint(canvas, Offset(startX + mainPainter.width, statsStartY + (baselineDiff/2) + 4));
     }
     
-    // Restore the Layout Transform (Scale/Offset)
-    canvas.restore();
-
+    
     // 5. Convert to Image
     final picture = recorder.endRecording();
     final img = await picture.toImage(width.toInt(), height.toInt());

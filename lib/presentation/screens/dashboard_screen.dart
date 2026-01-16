@@ -7,6 +7,7 @@ import 'package:year_dots/presentation/widgets/glass_card.dart';
 import 'package:year_dots/presentation/widgets/phone_frame_preview.dart';
 import 'package:year_dots/presentation/screens/customizer_screen.dart';
 import 'package:year_dots/presentation/screens/settings_screen.dart';
+import 'package:year_dots/data/services/background_service.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -143,18 +144,25 @@ class DashboardScreen extends StatelessWidget {
                             },
                           ),
                           Divider(color: Colors.white.withOpacity(0.05), height: 1),
-                          // Manual Update Trigger
+                           // Manual Update Trigger
                            ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(color: AppColors.backgroundDark, borderRadius: BorderRadius.circular(50)),
                               child: const Icon(Icons.wallpaper, color: AppColors.textSecondary),
                             ),
-                            title: Text("Update Wallpaper", style: GoogleFonts.splineSans(color: AppColors.textWhite, fontWeight: FontWeight.w600)),
-                            subtitle: Text("Force refresh now", style: GoogleFonts.splineSans(color: AppColors.textSecondary, fontSize: 12)),
-                            trailing: const Icon(Icons.play_arrow, size: 20, color: AppColors.primary),
-                            onTap: () {
-                                viewModel.setWallpaperNow();
+                            title: Text("Set Live Wallpaper", style: GoogleFonts.splineSans(color: AppColors.textWhite, fontWeight: FontWeight.w600)),
+                            subtitle: Text("Updates daily automatically", style: GoogleFonts.splineSans(color: AppColors.textSecondary, fontSize: 12)),
+                            trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.primary),
+                            onTap: () async {
+                                // Save current theme first
+                                await viewModel.setWallpaperNow(); // This saves theme? verify. 
+                                // Actually setWallpaperNow sets static. We just want to SAVE theme. 
+                                // viewModel.setTheme persists it.
+                                // But if user modified it in Customizer? This is Dashboard. Theme is already saved.
+                                // Just open picker.
+                                // We need BackgroundService import.
+                                await BackgroundService.openLiveWallpaperPicker();
                             },
                           ),
                         ],

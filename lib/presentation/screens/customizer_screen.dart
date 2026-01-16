@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:year_dots/core/constants/app_colors.dart';
 import 'package:year_dots/presentation/viewmodels/home_viewmodel.dart';
 import 'package:year_dots/presentation/widgets/phone_frame_preview.dart';
+import 'package:year_dots/data/services/background_service.dart';
 
 class CustomizerScreen extends StatelessWidget {
   const CustomizerScreen({super.key});
@@ -172,61 +173,31 @@ class CustomizerScreen extends StatelessWidget {
                           
                           const SizedBox(height: 32),
 
-                          // Section: Layout Adjustments (Scale & Position)
-                          _buildSectionHeader("Layout Adjustments"),
-                          const SizedBox(height: 16),
-                          
-                          // Scale Slider
+                          // Section: Grid Density
+                          _buildSectionHeader("Grid Density"),
+                          const SizedBox(height: 12),
                           Row(
                             children: [
-                                const Icon(Icons.zoom_in, color: Colors.white70, size: 20),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                    child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                            Text("Scale: ${(theme.scale * 100).toInt()}%", style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                                            Slider(
-                                                value: theme.scale,
-                                                min: 0.5,
-                                                max: 1.5,
-                                                divisions: 20,
-                                                activeColor: AppColors.primary,
-                                                inactiveColor: Colors.white10,
-                                                onChanged: (val) {
-                                                    _updateThemeLayout(viewModel, scale: val);
-                                                },
-                                            ),
-                                        ],
-                                    ),
-                                ),
-                            ],
-                          ),
-                          
-                          // Position Slider
-                          Row(
-                            children: [
-                                const Icon(Icons.unfold_more, color: Colors.white70, size: 20),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                    child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                            Text("Position Y: ${theme.yOffset.toInt()}", style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                                            Slider(
-                                                value: theme.yOffset,
-                                                min: -400,
-                                                max: 400,
-                                                divisions: 40,
-                                                activeColor: AppColors.primary,
-                                                inactiveColor: Colors.white10,
-                                                onChanged: (val) {
-                                                    _updateThemeLayout(viewModel, yOffset: val);
-                                                },
-                                            ),
-                                        ],
-                                    ),
-                                ),
+                              _buildStyleOption(
+                                "Large", 
+                                Icons.grid_view, 
+                                theme.gridColumns == 12,
+                                () => _updateThemeGrid(viewModel, 12),
+                              ),
+                              const SizedBox(width: 12),
+                              _buildStyleOption(
+                                "Standard", 
+                                Icons.grid_on, 
+                                theme.gridColumns == 15,
+                                () => _updateThemeGrid(viewModel, 15),
+                              ),
+                              const SizedBox(width: 12),
+                              _buildStyleOption(
+                                "Compact", 
+                                Icons.apps, 
+                                theme.gridColumns == 19,
+                                () => _updateThemeGrid(viewModel, 19),
+                              ),
                             ],
                           ),
 
@@ -281,9 +252,9 @@ class CustomizerScreen extends StatelessWidget {
           boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
         ),
         child: ElevatedButton(
-          onPressed: () {
-            viewModel.setWallpaperNow();
-             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Wallpaper Updated!")));
+          onPressed: () async {
+             // Theme is already saved on every change.
+             await BackgroundService.openLiveWallpaperPicker();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
@@ -294,7 +265,7 @@ class CustomizerScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Apply to Lock Screen", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text("Set Live Wallpaper", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
               const Icon(Icons.wallpaper)
             ],
@@ -404,13 +375,13 @@ class CustomizerScreen extends StatelessWidget {
       vm.setTheme(newTheme);
   }
 
-  void _updateThemeLayout(HomeViewModel vm, {double? scale, double? yOffset}) {
+  void _updateThemeGrid(HomeViewModel vm, int columns) {
      final current = vm.selectedTheme;
-     final newTheme = _createNewTheme(current, scale: scale, yOffset: yOffset);
+     final newTheme = _createNewTheme(current, gridColumns: columns);
      vm.setTheme(newTheme);
   }
 
-  AppTheme _createNewTheme(AppTheme current, {DotStyle? style, Color? dotToday, Color? textPrimary, Color? textSecondary, bool? showText, Color? background, double? scale, double? yOffset}) {
+  AppTheme _createNewTheme(AppTheme current, {DotStyle? style, Color? dotToday, Color? textPrimary, Color? textSecondary, bool? showText, Color? background, int? gridColumns}) {
      return AppTheme(
        id: 'custom_${DateTime.now().millisecondsSinceEpoch}', 
        name: 'Custom',
@@ -423,8 +394,7 @@ class CustomizerScreen extends StatelessWidget {
        textSecondary: textSecondary ?? current.textSecondary,
        dotStyle: style ?? current.dotStyle,
        showText: showText ?? current.showText,
-       scale: scale ?? current.scale,
-       yOffset: yOffset ?? current.yOffset,
+       gridColumns: gridColumns ?? current.gridColumns,
      );
   }
 }

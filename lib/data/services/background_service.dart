@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:flutter/services.dart';
 import 'package:year_dots/data/services/wallpaper_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:year_dots/core/constants/app_colors.dart';
@@ -29,8 +30,8 @@ void callbackDispatcher() {
              final bgColorValue = prefs.getInt('theme_background'); // New
              final styleIndex = prefs.getInt('theme_style') ?? 0;
              final showText = prefs.getBool('theme_show_text') ?? true;
-             final scale = prefs.getDouble('theme_scale') ?? 1.0;
-             final yOffset = prefs.getDouble('theme_y_offset') ?? 0.0;
+
+             final gridColumns = prefs.getInt('theme_grid_columns') ?? 15;
              
              final base = AppTheme.defaults;
              
@@ -55,8 +56,7 @@ void callbackDispatcher() {
                textSecondary: textSecondary,
                dotStyle: DotStyle.values[styleIndex],
                showText: showText,
-               scale: scale,
-               yOffset: yOffset,
+               gridColumns: gridColumns,
              );
           } else {
              theme = AppTheme.fromId(themeId);
@@ -108,5 +108,16 @@ class BackgroundService {
       initialDelay: initialDelay,
       existingWorkPolicy: ExistingWorkPolicy.update, // Use update to preserve if running, or replace? Replace is safer for rescheduling.
     );
+  }
+
+  static const platform = MethodChannel('com.yeardots.year_dots/native');
+
+  static Future<void> openLiveWallpaperPicker() async {
+    try {
+      if (kIsWeb) return;
+      await platform.invokeMethod('openLiveWallpaperPicker');
+    } on PlatformException catch (e) {
+      debugPrint("Failed to open picker: ${e.message}");
+    }
   }
 }

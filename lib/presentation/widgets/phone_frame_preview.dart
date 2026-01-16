@@ -21,12 +21,10 @@ class PhoneFramePreview extends StatelessWidget {
     
     return LayoutBuilder(
       builder: (context, constraints) {
-        // ... (existing code, keeping width/height calc)
         final double width = constraints.maxWidth;
         final double height = width * (19.5 / 9);
 
         return Container(
-          // ... (existing decoration)
           width: width,
           height: height,
           decoration: BoxDecoration(
@@ -41,23 +39,17 @@ class PhoneFramePreview extends StatelessWidget {
               children: [
                 Container(color: theme.background),
                 
-                // Content Layer (Transformed)
+                // Content Layer (Transformed) - removed Transforms, just Stack
                 Positioned.fill(
-                  child: Transform.translate(
-                    offset: Offset(0, theme.yOffset), // Apply Y Position
-                    child: Transform.scale(
-                      scale: theme.scale, // Apply Scale
-                      child: Stack(
+                  child: Stack(
                         children: [
                             // 2. The Dot Grid (Centered) with Margins for Text
                             Positioned.fill(
                               child: Padding(
                                 // Reduced margins to allow dots to be larger
-                                padding: EdgeInsets.only(
-                                  top: height * 0.11, // Moved UP (was 0.13)
-                                  bottom: height * 0.22, 
-                                  left: 16, 
-                                  right: 16
+                                padding: EdgeInsets.symmetric(
+                                  vertical: height * 0.15, // Symmetric 15% top/bottom -> Centers Grid
+                                  horizontal: 16,
                                 ),
                                 child: CustomPaint(
                                   painter: DotGridPainter(progress: progress, theme: theme),
@@ -68,7 +60,7 @@ class PhoneFramePreview extends StatelessWidget {
                             if (theme.showText) ...[
                                // Top Month
                                Positioned(
-                                 top: height * 0.07, 
+                                 top: height * 0.07, // Centered in top 15% gap
                                  left: 10, 
                                  right: 10,
                                  child: Text(
@@ -85,7 +77,7 @@ class PhoneFramePreview extends StatelessWidget {
 
                                // Bottom Stats
                                Positioned(
-                                 bottom: height * 0.14, // Moved UP (was 0.12)
+                                 bottom: height * 0.07, // Centered in bottom 15% gap
                                  left: 10, 
                                  right: 10,
                                  child: Row(
@@ -116,9 +108,7 @@ class PhoneFramePreview extends StatelessWidget {
                             ],
                         ],
                       ),
-                    ),
                   ),
-                ),
                 
                 // ... (Status Bar and others)
                 Positioned(
