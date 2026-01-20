@@ -99,6 +99,7 @@ class YearDotsWallpaperService : WallpaperService() {
             var dotTodayColor = Color.parseColor("#13C8EC") // Cyan
             var dotFutureColor = Color.parseColor("#1AFFFFFF") // White 10%
             var textColor = Color.WHITE
+            var secondaryTextColor = Color.parseColor("#94A3B8") // Default Slate 400
             var showText = true
             var isSquare = false
             var gridColumns = 15 // Default Standard
@@ -111,7 +112,11 @@ class YearDotsWallpaperService : WallpaperService() {
                  if (colorVal != -1L) dotTodayColor = colorVal.toInt()
 
                  val textVal = prefs.getLong(themePrefix + "theme_text_color", -1)
-                 if (textVal != -1L) textColor = textVal.toInt()
+                 if (textVal != -1L) {
+                     textColor = textVal.toInt()
+                     // Derive secondary color (60% opacity) from primary if custom
+                     secondaryTextColor = Color.argb(153, Color.red(textColor), Color.green(textColor), Color.blue(textColor))
+                 }
 
                  showText = prefs.getBoolean(themePrefix + "theme_show_text", true)
                  
@@ -201,7 +206,7 @@ class YearDotsWallpaperService : WallpaperService() {
                 }
 
                 // Month (Top) - 7%
-                textPaint.color = Color.argb(255, 148, 163, 184) // Slate 400
+                textPaint.color = secondaryTextColor // Use derived or default secondary
                 textPaint.textSize = width * 0.05f
                 textPaint.typeface = Typeface.create("sans-serif", Typeface.NORMAL)
                 textPaint.letterSpacing = 0.2f // Android letter spacing is EM based
@@ -209,7 +214,6 @@ class YearDotsWallpaperService : WallpaperService() {
                 canvas.drawText(monthName, width / 2f, height * 0.07f + textPaint.textSize, textPaint)
 
                 // Bottom Stats - 7% from bottom
-                // We want to verify visual parity: Cyan Highlight for "Day/Total"
                 val statsY = height - (height * 0.07f)
                 
                 val mainText = "$dayOfYear / $totalDays"
@@ -226,8 +230,8 @@ class YearDotsWallpaperService : WallpaperService() {
                 val totalWidth = mainWidth + subWidth
                 var currentX = (width - totalWidth) / 2
 
-                // Draw Main
-                textPaint.color = dotTodayColor
+                // Draw Main - Uses Dot Highlight Color (Theme Color) to match Flutter logic
+                textPaint.color = dotTodayColor 
                 textPaint.textSize = width * 0.05f
                 textPaint.typeface = Typeface.create("sans-serif", Typeface.BOLD)
                 textPaint.textAlign = Paint.Align.LEFT
@@ -235,8 +239,17 @@ class YearDotsWallpaperService : WallpaperService() {
                 
                 currentX += mainWidth
 
-                // Draw Sub
-                textPaint.color = Color.argb(200, 148, 163, 184) // Translucent Slate 400
+                // Draw Sub - Uses Secondary with extra opacity (0.8 of secondary)
+                // secondaryTextColor already has ~153 alpha (0.6). 
+                // We need 0.8 relative to that? Or just 0.8 of opacity?
+                // Flutter: theme.textSecondary.withOpacity(0.8) -> 0.48 absolute.
+                // Let's just Apply 0.8 opacity to the secondaryTextColor base.
+                val secR = Color.red(secondaryTextColor)
+                val secG = Color.green(secondaryTextColor)
+                val secB = Color.blue(secondaryTextColor)
+                val secA = Color.alpha(secondaryTextColor)
+                textPaint.color = Color.argb((secA * 0.8).toInt(), secR, secG, secB)
+
                 textPaint.textSize = width * 0.035f
                 textPaint.typeface = Typeface.create("sans-serif", Typeface.NORMAL)
                 canvas.drawText(subText, currentX, statsY, textPaint)
