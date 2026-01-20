@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Feature - YearDots</title>
+    <link rel="icon" href="assets/icon.png" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-globes">
+        <div class="globe globe-1"></div>
+        <div class="globe globe-2"></div>
+        <div class="globe globe-3"></div>
+    </div>
+
+    <header class="glass-header">
+        <div class="logo-container">
+            <a href="index.html"
+                style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
+                <img src="assets/icon.png" alt="YearDots Logo" class="logo">
+                <h1>YearDots</h1>
+            </a>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="download/YearDots.apk" class="download-btn-small">Download</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="request-section">
+            <h2 class="section-title animate-fade-up">Request a Feature</h2>
+            <p class="animate-fade-up delay-1">Have an idea to make YearDots better? Let us know!</p>
+
+            <form class="glass-form animate-fade-up delay-2" onsubmit="sendEmail(event)">
+                <div class="form-group">
+                    <label for="title">Feature Title</label>
+                    <input type="text" id="title" required placeholder="e.g., Add more color themes">
+                </div>
+
+                <div class="form-group">
+                    <label for="importance">Importance</label>
+                    <select id="importance">
+                        <option value="Low">Low - Nice to have</option>
+                        <option value="Medium" selected>Medium - Would improve experience</option>
+                        <option value="High">High - Critical for me</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Details</label>
+                    <textarea id="description" required rows="5"
+                        placeholder="Describe how this feature should work..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span class="btn-icon">🚀</span> Send Request
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="glass-footer">
+        <p>Made by Dhruwayush ⚡</p>
+    </footer>
+
+    <script>
+        function sendEmail(event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const importance = document.getElementById('importance').value;
+
+            const subject = `Feature Request: ${title}`;
+            const body = `Importance: ${importance}\n\nDetails:\n${description}`;
+
+            window.location.href = `mailto:dhruwayush@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+    </script>
+</body>
+
+</html>
