@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Bug - YearDots</title>
+    <link rel="icon" href="assets/icon.png" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-globes">
+        <div class="globe globe-1"></div>
+        <div class="globe globe-2"></div>
+        <div class="globe globe-3"></div>
+    </div>
+
+    <header class="glass-header">
+        <div class="logo-container">
+            <a href="index.html"
+                style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
+                <img src="assets/icon.png" alt="YearDots Logo" class="logo">
+                <h1>YearDots</h1>
+            </a>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="download/YearDots.apk" class="download-btn-small">Download</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="request-section">
+            <h2 class="section-title animate-fade-up">Report a Bug</h2>
+            <p class="animate-fade-up delay-1">Found something broken? Help us fix it!</p>
+
+            <form class="glass-form animate-fade-up delay-2" onsubmit="sendEmail(event)">
+                <div class="form-group">
+                    <label for="title">Bug Title</label>
+                    <input type="text" id="title" required placeholder="e.g., App crashes on open">
+                </div>
+
+                <div class="form-group">
+                    <label for="severity">Severity</label>
+                    <select id="severity">
+                        <option value="Low">Low - Visual glitch / Minor annoyance</option>
+                        <option value="Medium" selected>Medium - Feature not working</option>
+                        <option value="High">High - App crashes / Unusable</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Steps to Reproduce</label>
+                    <textarea id="description" required rows="5"
+                        placeholder="1. Open Settings...&#10;2. Tap on...&#10;3. Observed behavior..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn"
+                    style="background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%);">
+                    <span class="btn-icon">🐞</span> Submit Report
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="glass-footer">
+        <p>Made by Dhruwayush ⚡</p>
+    </footer>
+
+    <script>
+        function sendEmail(event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const severity = document.getElementById('severity').value;
+
+            const subject = `Bug Report: ${title}`;
+            const body = `Severity: ${severity}\n\nDetails:\n${description}`;
+
+            window.location.href = `mailto:dhruwayush@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+    </script>
+</body>
+
+</html>

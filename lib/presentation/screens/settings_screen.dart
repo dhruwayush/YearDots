@@ -125,7 +125,7 @@ class SettingsScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => _launchUrl('https://buymeacoffee.com/dhruwayush'), // Placeholder
+              onPressed: () => _launchUrl('upi://pay?pa=paytmqr28100505010119630dcxadmy@paytm&pn=Paytm%20Merchant&mc=5499&mode=02&orgid=000000&paytmqr=28100505010119630DCXADMY&sign=MEUCIGxKP4ucXxOCaNOYr5HDimqzUxRF7N9W9DOEKvP3oop+AiEAgA85+WNYmc77eGWPn+J8j70KhpinRIgkX5YXOH43BI4=&tn=YearDots'), // Placeholder
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.pink.shade500,
@@ -136,9 +136,9 @@ class SettingsScreen extends StatelessWidget {
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.coffee_rounded, size: 20),
+                  Icon(Icons.volunteer_activism, size: 20),
                   SizedBox(width: 8),
-                  Text("Donate ☕", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("Support via UPI", style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -162,7 +162,7 @@ class SettingsScreen extends StatelessWidget {
             title: "Request Feature",
             subtitle: "Have an idea? Let me know!",
             trailing: const Icon(Icons.arrow_outward, size: 16, color: Colors.white30),
-            onTap: () => _launchUrl('mailto:dhruwayush@gmail.com?subject=YearDots%20Feature%20Request'), // Placeholder
+            onTap: () => _launchUrl('https://yeardots.vercel.app/request.html'),
           ),
            const Divider(height: 1, color: Colors.white10, indent: 60, endIndent: 20),
           _buildActionRow(
@@ -171,7 +171,7 @@ class SettingsScreen extends StatelessWidget {
             title: "Report Bug",
             subtitle: "Something not working?",
             trailing: const Icon(Icons.arrow_outward, size: 16, color: Colors.white30),
-            onTap: () => _launchUrl('mailto:dhruwayush@gmail.com?subject=YearDots%20Bug%20Report'),
+            onTap: () => _launchUrl('https://yeardots.vercel.app/bug.html'),
           ),
         ],
       ),
