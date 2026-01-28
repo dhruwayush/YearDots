@@ -17,9 +17,16 @@ class DashboardScreen extends StatelessWidget {
     final viewModel = Provider.of<HomeViewModel>(context);
     final progress = viewModel.yearProgress;
     final theme = viewModel.selectedTheme;
+    final isDark = viewModel.isDarkMode;
+    
+    // Theme-aware colors
+    final backgroundColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final textColor = isDark ? AppColors.textWhite : Colors.black87;
+    final secondaryTextColor = isDark ? AppColors.textSecondary : Colors.black54;
+    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -34,11 +41,11 @@ class DashboardScreen extends StatelessWidget {
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textWhite,
+                      color: textColor,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.settings_outlined, color: AppColors.textSecondary),
+                    icon: Icon(Icons.settings_outlined, color: secondaryTextColor),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -59,10 +66,10 @@ class DashboardScreen extends StatelessWidget {
                   children: [
                     // Phone Preview (Hero)
                     SizedBox(
-                      height: 500, // Explicit height for the frame area
+                      height: 500,
                       child: Center(
                         child: SizedBox(
-                          width: 260, // Constrain width for phone look
+                          width: 260,
                           child: PhoneFramePreview(progress: progress, theme: theme),
                         ),
                       ),
@@ -75,6 +82,7 @@ class DashboardScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: GlassCard(
+                            isDark: isDark,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -82,13 +90,13 @@ class DashboardScreen extends StatelessWidget {
                                   children: [
                                     const Icon(Icons.pie_chart_outline, color: AppColors.primary, size: 20),
                                     const SizedBox(width: 8),
-                                    Text("COMPLETE", style: GoogleFonts.splineSans(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                                    Text("COMPLETE", style: GoogleFonts.splineSans(color: secondaryTextColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                                   ],
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   "${progress.progressPercent.toStringAsFixed(0)}%",
-                                  style: GoogleFonts.spaceGrotesk(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textWhite),
+                                  style: GoogleFonts.spaceGrotesk(fontSize: 32, fontWeight: FontWeight.bold, color: textColor),
                                 ),
                               ],
                             ),
@@ -97,6 +105,7 @@ class DashboardScreen extends StatelessWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           child: GlassCard(
+                            isDark: isDark,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -104,13 +113,13 @@ class DashboardScreen extends StatelessWidget {
                                   children: [
                                     const Icon(Icons.hourglass_bottom, color: AppColors.primary, size: 20),
                                     const SizedBox(width: 8),
-                                    Text("DAYS LEFT", style: GoogleFonts.splineSans(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                                    Text("DAYS LEFT", style: GoogleFonts.splineSans(color: secondaryTextColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                                   ],
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   "${progress.daysLeft}",
-                                  style: GoogleFonts.spaceGrotesk(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textWhite),
+                                  style: GoogleFonts.spaceGrotesk(fontSize: 32, fontWeight: FontWeight.bold, color: textColor),
                                 ),
                               ],
                             ),
@@ -123,6 +132,7 @@ class DashboardScreen extends StatelessWidget {
 
                     // Actions Card
                     GlassCard(
+                      isDark: isDark,
                       padding: const EdgeInsets.all(8),
                       child: Column(
                         children: [
@@ -130,12 +140,15 @@ class DashboardScreen extends StatelessWidget {
                           ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: AppColors.backgroundDark, borderRadius: BorderRadius.circular(50)),
-                              child: const Icon(Icons.palette_outlined, color: AppColors.textSecondary),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.backgroundDark : Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: Icon(Icons.palette_outlined, color: secondaryTextColor),
                             ),
-                            title: Text("Customize Style", style: GoogleFonts.splineSans(color: AppColors.textWhite, fontWeight: FontWeight.w600)),
-                            subtitle: Text("Colors, shapes & layout", style: GoogleFonts.splineSans(color: AppColors.textSecondary, fontSize: 12)),
-                            trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.textSecondary),
+                            title: Text("Customize Style", style: GoogleFonts.splineSans(color: textColor, fontWeight: FontWeight.w600)),
+                            subtitle: Text("Colors, shapes & layout", style: GoogleFonts.splineSans(color: secondaryTextColor, fontSize: 12)),
+                            trailing: Icon(Icons.arrow_forward_ios, size: 16, color: secondaryTextColor),
                             onTap: () {
                                 Navigator.push(
                                   context, 
@@ -143,25 +156,21 @@ class DashboardScreen extends StatelessWidget {
                                 );
                             },
                           ),
-                          Divider(color: Colors.white.withOpacity(0.05), height: 1),
+                          Divider(color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05), height: 1),
                            // Manual Update Trigger
                            ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: AppColors.backgroundDark, borderRadius: BorderRadius.circular(50)),
-                              child: const Icon(Icons.wallpaper, color: AppColors.textSecondary),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.backgroundDark : Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: Icon(Icons.wallpaper, color: secondaryTextColor),
                             ),
-                            title: Text("Set Live Wallpaper", style: GoogleFonts.splineSans(color: AppColors.textWhite, fontWeight: FontWeight.w600)),
-                            subtitle: Text("Updates daily automatically", style: GoogleFonts.splineSans(color: AppColors.textSecondary, fontSize: 12)),
+                            title: Text("Set Live Wallpaper", style: GoogleFonts.splineSans(color: textColor, fontWeight: FontWeight.w600)),
+                            subtitle: Text("Updates daily automatically", style: GoogleFonts.splineSans(color: secondaryTextColor, fontSize: 12)),
                             trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.primary),
                             onTap: () async {
-                                // Save current theme first
-                                await viewModel.setWallpaperNow(); // This saves theme? verify. 
-                                // Actually setWallpaperNow sets static. We just want to SAVE theme. 
-                                // viewModel.setTheme persists it.
-                                // But if user modified it in Customizer? This is Dashboard. Theme is already saved.
-                                // Just open picker.
-                                // We need BackgroundService import.
                                 await BackgroundService.openLiveWallpaperPicker();
                             },
                           ),

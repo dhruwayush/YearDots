@@ -22,17 +22,29 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HomeViewModel(),
-      child: MaterialApp(
-        title: 'YearDots',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF13C8EC), // Cyan
-            brightness: Brightness.dark, 
-          ),
-          useMaterial3: true,
-        ),
-        home: const DashboardScreen(),
-        debugShowCheckedModeBanner: false,
+      child: Consumer<HomeViewModel>(
+        builder: (context, viewModel, child) {
+          return MaterialApp(
+            title: 'YearDots',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF13C8EC), // Cyan
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
+            ),
+            darkTheme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF13C8EC), // Cyan
+                brightness: Brightness.dark,
+              ),
+              useMaterial3: true,
+            ),
+            themeMode: viewModel.themeMode,
+            home: const DashboardScreen(),
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
     );
   }

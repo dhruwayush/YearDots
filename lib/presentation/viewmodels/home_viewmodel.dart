@@ -9,9 +9,12 @@ import 'package:year_dots/data/services/wallpaper_service.dart';
 class HomeViewModel extends ChangeNotifier {
   late YearProgress _yearProgress;
   AppTheme _selectedTheme = AppTheme.defaults;
+  ThemeMode _themeMode = ThemeMode.dark;
 
   YearProgress get yearProgress => _yearProgress;
   AppTheme get selectedTheme => _selectedTheme;
+  ThemeMode get themeMode => _themeMode;
+  bool get isDarkMode => _themeMode == ThemeMode.dark;
 
   HomeViewModel() {
     _refreshData();
@@ -26,6 +29,10 @@ class HomeViewModel extends ChangeNotifier {
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     final themeId = prefs.getString('theme_id') ?? 'default';
+    
+    // Load theme mode preference
+    final isDark = prefs.getBool('app_dark_mode') ?? true;
+    _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
 
     if (themeId.startsWith('custom_')) {
         // Reconstruct custom theme
@@ -90,5 +97,12 @@ class HomeViewModel extends ChangeNotifier {
   Future<bool> setWallpaperNow() async {
     final service = WallpaperService();
     return await service.updateWallpaper(theme: _selectedTheme);
+  }
+
+  Future<void> toggleThemeMode() async {
+    _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('app_dark_mode', _themeMode == ThemeMode.dark);
   }
 }

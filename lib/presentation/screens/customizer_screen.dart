@@ -11,42 +11,35 @@ class CustomizerScreen extends StatelessWidget {
 
   // Curated Palette for Dark Mode
   static const List<Color> _colorPalette = [
-    // Essentials
     Colors.white,
-    AppColors.primary, // Cyan
-    Color(0xFFFFD740), // Amber Accent
-    
-    // Vibrant
-    Color(0xFFFF4081), // Pink Accent
-    Color(0xFF00E676), // Green Accent
-    Color(0xFF76FF03), // Light Green (Acid)
-    Color(0xFFD500F9), // Purple Accent
-    Color(0xFFFF6D00), // Deep Orange
-    
-    // Pastel / Soft
-    Color(0xFF80DEEA), // Cyan 200
-    Color(0xFFFFAB91), // Deep Orange 200 (Peach)
-    Color(0xFFF48FB1), // Pink 200
-    Color(0xFFCE93D8), // Purple 200
-    
-    // Cool / Deep
-    Color(0xFF2979FF), // Blue Accent
-    Color(0xFF3D5AFE), // Indigo Accent
-    Color(0xFF607D8B), // Blue Grey
+    AppColors.primary,
+    Color(0xFFFFD740),
+    Color(0xFFFF4081),
+    Color(0xFF00E676),
+    Color(0xFF76FF03),
+    Color(0xFFD500F9),
+    Color(0xFFFF6D00),
+    Color(0xFF80DEEA),
+    Color(0xFFFFAB91),
+    Color(0xFFF48FB1),
+    Color(0xFFCE93D8),
+    Color(0xFF2979FF),
+    Color(0xFF3D5AFE),
+    Color(0xFF607D8B),
   ];
 
   static const List<Color> _backgroundPalette = [
-    AppColors.backgroundDark, // Default
+    AppColors.backgroundDark,
     Colors.black,
-    Color(0xFF1A237E), // Deep Indigo
-    Color(0xFF000051), // Navy
-    Color(0xFF1B5E20), // Dark Green
-    Color(0xFF263238), // Blue Grey Dark
-    Color(0xFF3E2723), // Dark Brown
-    Color(0xFF212121), // Grey 900
-    Color(0xFF311B92), // Deep Purple
-    Color(0xFF0D47A1), // Deep Blue
-    Color(0xFFB71C1C), // Red darken
+    Color(0xFF1A237E),
+    Color(0xFF000051),
+    Color(0xFF1B5E20),
+    Color(0xFF263238),
+    Color(0xFF3E2723),
+    Color(0xFF212121),
+    Color(0xFF311B92),
+    Color(0xFF0D47A1),
+    Color(0xFFB71C1C),
   ];
 
   @override
@@ -54,9 +47,17 @@ class CustomizerScreen extends StatelessWidget {
     final viewModel = Provider.of<HomeViewModel>(context);
     final theme = viewModel.selectedTheme;
     final progress = viewModel.yearProgress;
+    final isDark = viewModel.isDarkMode;
+    
+    // Theme-aware colors
+    final backgroundColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final textColor = isDark ? AppColors.textWhite : Colors.black87;
+    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final surfaceDarkerColor = isDark ? AppColors.surfaceDarker : Colors.grey.shade100;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -66,15 +67,14 @@ class CustomizerScreen extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.textWhite),
+                    icon: Icon(Icons.arrow_back, color: textColor),
                     onPressed: () => Navigator.pop(context),
                   ),
                   const SizedBox(width: 8),
-                  Text("Customize Wallpaper", style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textWhite)),
+                  Text("Customize Wallpaper", style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.bold, color: textColor)),
                   const Spacer(),
                   TextButton(
                     onPressed: () {
-                         // Reset logic if needed, or just set default
                          viewModel.setTheme(AppTheme.defaults);
                     },
                     child: const Text("Reset", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
@@ -99,27 +99,25 @@ class CustomizerScreen extends StatelessWidget {
               flex: 4,
               child: Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: AppColors.surfaceDark,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-                  // Removed explicit top border to avoid conflict with borderRadius. 
-                  // Visual separation handled by color difference or shadow if needed.
+                decoration: BoxDecoration(
+                  color: surfaceColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                   boxShadow: [
-                    BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, -4))
+                    BoxShadow(color: Colors.black26, blurRadius: 10, offset: const Offset(0, -4))
                   ],
                 ),
                 child: Column(
                   children: [
                     const SizedBox(height: 12),
                     // Drag Handle
-                    Container(width: 48, height: 6, decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(3))),
+                    Container(width: 48, height: 6, decoration: BoxDecoration(color: isDark ? Colors.white10 : Colors.black12, borderRadius: BorderRadius.circular(3))),
                     
                     Expanded(
                       child: ListView(
                         padding: const EdgeInsets.all(24),
                         children: [
                           // Section: Dot Style
-                          _buildSectionHeader("Dot Style"),
+                          _buildSectionHeader("Dot Style", secondaryTextColor),
                           const SizedBox(height: 12),
                           Row(
                             children: [
@@ -128,6 +126,9 @@ class CustomizerScreen extends StatelessWidget {
                                 Icons.circle, 
                                 theme.dotStyle == DotStyle.round,
                                 () => _updateThemeStyle(viewModel, DotStyle.round),
+                                isDark,
+                                textColor,
+                                surfaceDarkerColor,
                               ),
                               const SizedBox(width: 16),
                               _buildStyleOption(
@@ -135,6 +136,9 @@ class CustomizerScreen extends StatelessWidget {
                                 Icons.square_rounded, 
                                 theme.dotStyle == DotStyle.square,
                                 () => _updateThemeStyle(viewModel, DotStyle.square),
+                                isDark,
+                                textColor,
+                                surfaceDarkerColor,
                               ),
                             ],
                           ),
@@ -143,7 +147,7 @@ class CustomizerScreen extends StatelessWidget {
 
                           const SizedBox(height: 32),
                           // Section: Highlight Color (Dot)
-                          _buildSectionHeader("Highlight Color"),
+                          _buildSectionHeader("Highlight Color", secondaryTextColor),
                           const SizedBox(height: 12),
                           SizedBox(
                             height: 60,
@@ -151,14 +155,14 @@ class CustomizerScreen extends StatelessWidget {
                               scrollDirection: Axis.horizontal,
                               itemCount: _colorPalette.length,
                               itemBuilder: (context, index) {
-                                return _buildColorOption(viewModel, _colorPalette[index], isText: false);
+                                return _buildColorOption(viewModel, _colorPalette[index], isText: false, isDark: isDark);
                               },
                             ),
                           ),
 
                           const SizedBox(height: 32),
                           // Section: Background Color
-                          _buildSectionHeader("Background Color"),
+                          _buildSectionHeader("Background Color", secondaryTextColor),
                           const SizedBox(height: 12),
                           SizedBox(
                             height: 60,
@@ -166,7 +170,7 @@ class CustomizerScreen extends StatelessWidget {
                               scrollDirection: Axis.horizontal,
                               itemCount: _backgroundPalette.length,
                               itemBuilder: (context, index) {
-                                return _buildColorOption(viewModel, _backgroundPalette[index], isText: false, isBackground: true);
+                                return _buildColorOption(viewModel, _backgroundPalette[index], isText: false, isBackground: true, isDark: isDark);
                               },
                             ),
                           ),
@@ -174,7 +178,7 @@ class CustomizerScreen extends StatelessWidget {
                           const SizedBox(height: 32),
 
                           // Section: Grid Density
-                          _buildSectionHeader("Grid Density"),
+                          _buildSectionHeader("Grid Density", secondaryTextColor),
                           const SizedBox(height: 12),
                           Row(
                             children: [
@@ -183,6 +187,9 @@ class CustomizerScreen extends StatelessWidget {
                                 Icons.grid_view, 
                                 theme.gridColumns == 12,
                                 () => _updateThemeGrid(viewModel, 12),
+                                isDark,
+                                textColor,
+                                surfaceDarkerColor,
                               ),
                               const SizedBox(width: 12),
                               _buildStyleOption(
@@ -190,6 +197,9 @@ class CustomizerScreen extends StatelessWidget {
                                 Icons.grid_on, 
                                 theme.gridColumns == 15,
                                 () => _updateThemeGrid(viewModel, 15),
+                                isDark,
+                                textColor,
+                                surfaceDarkerColor,
                               ),
                               const SizedBox(width: 12),
                               _buildStyleOption(
@@ -197,6 +207,9 @@ class CustomizerScreen extends StatelessWidget {
                                 Icons.apps, 
                                 theme.gridColumns == 19,
                                 () => _updateThemeGrid(viewModel, 19),
+                                isDark,
+                                textColor,
+                                surfaceDarkerColor,
                               ),
                             ],
                           ),
@@ -206,7 +219,7 @@ class CustomizerScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                               _buildSectionHeader("Text Details"),
+                               _buildSectionHeader("Text Details", secondaryTextColor),
                                Switch(
                                  value: theme.showText,
                                  activeColor: AppColors.primary,
@@ -225,14 +238,14 @@ class CustomizerScreen extends StatelessWidget {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: _colorPalette.length,
                                 itemBuilder: (context, index) {
-                                  return _buildColorOption(viewModel, _colorPalette[index], isText: true);
+                                  return _buildColorOption(viewModel, _colorPalette[index], isText: true, isDark: isDark);
                                 },
                               ),
                             ),
                           ] else 
-                             const Text("Text overlay hidden on wallpaper.", style: TextStyle(color: Colors.white24, fontSize: 12)),
+                             Text("Text overlay hidden on wallpaper.", style: TextStyle(color: secondaryTextColor.withValues(alpha: 0.5), fontSize: 12)),
                           
-                          const SizedBox(height: 80), // Specs
+                          const SizedBox(height: 80),
                         ],
                       ),
                     ),
@@ -249,11 +262,10 @@ class CustomizerScreen extends StatelessWidget {
         height: 56,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
-          boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+          boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10))],
         ),
         child: ElevatedButton(
           onPressed: () async {
-             // Theme is already saved on every change.
              await BackgroundService.openLiveWallpaperPicker();
           },
           style: ElevatedButton.styleFrom(
@@ -262,12 +274,12 @@ class CustomizerScreen extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
             elevation: 0,
           ),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Set Live Wallpaper", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(width: 8),
-              const Icon(Icons.wallpaper)
+              Text("Set Live Wallpaper", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              SizedBox(width: 8),
+              Icon(Icons.wallpaper)
             ],
           ),
         ),
@@ -276,30 +288,32 @@ class CustomizerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, Color textColor) {
     return Text(
       title.toUpperCase(),
-      style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: Colors.white70),
+      style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: textColor),
     );
   }
 
-  Widget _buildStyleOption(String label, IconData icon, bool isSelected, VoidCallback onTap) {
+  Widget _buildStyleOption(String label, IconData icon, bool isSelected, VoidCallback onTap, bool isDark, Color textColor, Color surfaceDarkerColor) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white.withOpacity(0.1) : AppColors.surfaceDarker,
+            color: isSelected 
+                ? (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05))
+                : surfaceDarkerColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isSelected ? AppColors.primary : Colors.white10),
+            border: Border.all(color: isSelected ? AppColors.primary : (isDark ? Colors.white10 : Colors.black12)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 20, color: isSelected ? AppColors.primary : Colors.white24),
+              Icon(icon, size: 20, color: isSelected ? AppColors.primary : (isDark ? Colors.white24 : Colors.black26)),
               const SizedBox(width: 8),
-              Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.white60, fontWeight: FontWeight.w600)),
+              Text(label, style: TextStyle(color: isSelected ? textColor : (isDark ? Colors.white60 : Colors.black54), fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -307,7 +321,7 @@ class CustomizerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildColorOption(HomeViewModel viewModel, Color color, {required bool isText, bool isBackground = false}) {
+  Widget _buildColorOption(HomeViewModel viewModel, Color color, {required bool isText, bool isBackground = false, required bool isDark}) {
     Color currentVal;
     if (isBackground) {
         currentVal = viewModel.selectedTheme.background;
@@ -336,8 +350,10 @@ class CustomizerScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: isSelected ? Border.all(color: Colors.white, width: 3) : Border.all(color: Colors.white10),
-          boxShadow: [if (isSelected) BoxShadow(color: color.withOpacity(0.5), blurRadius: 10)],
+          border: isSelected 
+              ? Border.all(color: isDark ? Colors.white : Colors.black, width: 3) 
+              : Border.all(color: isDark ? Colors.white10 : Colors.black12),
+          boxShadow: [if (isSelected) BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 10)],
         ),
         child: isSelected ? Icon(Icons.check, color: color.computeLuminance() > 0.5 ? Colors.black54 : Colors.white) : null,
       ),
@@ -358,8 +374,7 @@ class CustomizerScreen extends StatelessWidget {
 
   void _updateThemeTextColor(HomeViewModel vm, Color color) {
      final current = vm.selectedTheme;
-     // When updating text color, we update Primary and derived Secondary
-     final newTheme = _createNewTheme(current, textPrimary: color, textSecondary: color.withOpacity(0.6));
+     final newTheme = _createNewTheme(current, textPrimary: color, textSecondary: color.withValues(alpha: 0.6));
      vm.setTheme(newTheme);
   }
 

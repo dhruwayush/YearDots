@@ -6,6 +6,7 @@ class GlassCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
   final Color? backgroundColor;
+  final bool isDark;
 
   const GlassCard({
     super.key,
@@ -13,21 +14,30 @@ class GlassCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(16),
     this.onTap,
     this.backgroundColor,
+    this.isDark = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final defaultColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final borderColor = isDark 
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
+    final shadowColor = isDark 
+        ? Colors.black.withValues(alpha: 0.2)
+        : Colors.black.withValues(alpha: 0.08);
+    
     return Container(
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.surfaceDark,
+        color: backgroundColor ?? defaultColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Colors.white.withOpacity(0.05),
+          color: borderColor,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: shadowColor,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
